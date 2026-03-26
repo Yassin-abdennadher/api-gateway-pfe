@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'node:18-alpine'
+            args '-v /var/run/docker.sock:/var/run/docker.sock'
+        }
+    }
     
     environment {
         DOCKER_IMAGE = 'api-gateway'
@@ -7,10 +12,6 @@ pipeline {
         NETWORK = 'gmao-network'
         PORT = '8000:8000'
         COMPOSE_PATH = '/var/jenkins_home/workspace/api-gateway-pfe'
-    }
-
-    tools {
-        nodejs 'node-18'
     }
     
     stages {
