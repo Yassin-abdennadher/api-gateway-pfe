@@ -8,6 +8,10 @@ pipeline {
         PORT = '8000:8000'
         COMPOSE_PATH = '/var/jenkins_home/workspace/api-gateway-pfe'
     }
+
+    tools {
+        nodejs 'node-18'
+    }
     
     stages {
         stage('Checkout') {
