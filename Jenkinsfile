@@ -12,6 +12,8 @@ pipeline {
         stage('Checkout') {
             steps {
                 git branch: 'master', url: 'https://github.com/Yassin-abdennadher/api-gateway-pfe.git'
+                sh 'pwd'
+                sh 'ls -la'
             }
         }
         
