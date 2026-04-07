@@ -43,9 +43,11 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh '''
-                    cd /workspace
-                    /usr/local/bin/docker rm -f api-gateway 2>/dev/null || true
-                    /usr/local/bin/docker-compose up -d --no-deps api-gateway
+                    # Méthode 1 : Spécifier le fichier
+                    /usr/local/bin/docker-compose -f /workspace/docker-compose.yml up -d api-gateway
+                    
+                    # Méthode 2 : Aller dans le dossier
+                    cd /workspace && /usr/local/bin/docker-compose up -d api-gateway
                 '''
             }
         }
