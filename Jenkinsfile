@@ -9,12 +9,6 @@ pipeline {
     }
     
     stages {
-        stage('Checkout') {
-            steps {
-                git branch: 'master', url: 'https://github.com/Yassin-abdennadher/api-gateway-pfe.git'
-            }
-        }
-        
         stage('Install') {
             steps {
                 sh "docker run --rm -v ${WORKSPACE}:/app -w /app node:18-alpine npm install"
