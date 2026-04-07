@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'node:18-alpine'
+            args '-v /var/run/docker.sock:/var/run/docker.sock -u root'
+        }
+    }
     
     environment {
         DOCKER_IMAGE = 'api-gateway'
@@ -9,27 +14,34 @@ pipeline {
     }
     
     stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
         stage('Install') {
             steps {
-                sh "docker run --rm -v ${WORKSPACE}:/app -w /app node:18-alpine npm install"
+                sh 'apk add --no-cache docker-cli'
+                sh 'npm install'
             }
         }
         
         stage('Build') {
             steps {
-                sh "docker run --rm -v ${WORKSPACE}:/app -w /app node:18-alpine npm run build"
+                sh 'npm run build'
             }
         }
         
         stage('Test') {
             steps {
-                sh "docker run --rm -v ${WORKSPACE}:/app -w /app node:18-alpine npm test || echo 'No tests found'"
+                sh 'npm test || echo "No tests found"'
             }
         }
         
         stage('Docker Build') {
             steps {
-                sh "docker build -t ${DOCKER_IMAGE}:latest ."
+                sh 'docker build -t api-gateway:latest .'
             }
         }
         
