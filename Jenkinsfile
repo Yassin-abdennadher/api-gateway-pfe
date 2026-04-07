@@ -6,38 +6,37 @@ pipeline {
         CONTAINER_NAME = 'api-gateway'
         NETWORK = 'gmao-network'
         PORT = '8000:8000'
+        WORKSPACE = '/var/jenkins_home/workspace/api-gateway'
     }
     
     stages {
         stage('Checkout') {
             steps {
                 git branch: 'master', url: 'https://github.com/Yassin-abdennadher/api-gateway-pfe.git'
-                sh 'pwd'
-                sh 'ls -la'
             }
         }
         
         stage('Install') {
             steps {
-                sh 'docker run --rm -v $PWD:/app -w /app node:18-alpine npm install'
+                sh "docker run --rm -v ${WORKSPACE}:/app -w /app node:18-alpine npm install"
             }
         }
         
         stage('Build') {
             steps {
-                sh 'docker run --rm -v $PWD:/app -w /app node:18-alpine npm run build'
+                sh "docker run --rm -v ${WORKSPACE}:/app -w /app node:18-alpine npm run build"
             }
         }
         
         stage('Test') {
             steps {
-                sh 'docker run --rm -v $PWD:/app -w /app node:18-alpine npm test || echo "No tests found"'
+                sh "docker run --rm -v ${WORKSPACE}:/app -w /app node:18-alpine npm test || echo 'No tests found'"
             }
         }
         
         stage('Docker Build') {
             steps {
-                sh "docker build -t ${DOCKER_IMAGE}:latest ."
+                sh "cd ${WORKSPACE} && docker build -t ${DOCKER_IMAGE}:latest ."
             }
         }
         
