@@ -41,10 +41,10 @@ pipeline {
         }
         
         stage('Deploy') {
-            steps {
+                    steps {
                 sh '''
                     cd /workspace
-                    docker-compose restart api-gateway
+                    /usr/local/bin/docker-compose restart api-gateway
                 '''
             }
         }
