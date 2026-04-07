@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:18-alpine'
-            args '-v /var/run/docker.sock:/var/run/docker.sock -u root'
-        }
-    }
+    agent any
     
     environment {
         DOCKER_IMAGE = 'api-gateway'
@@ -20,9 +15,28 @@ pipeline {
             }
         }
         
-        stage('Install') {
+        stage('Install Node.js & Docker') {
             steps {
-                sh 'apk add --no-cache docker-cli'
+                sh '''
+                    # Installer Node.js
+                    apt-get update
+                    apt-get install -y curl
+                    curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+                    apt-get install -y nodejs
+                    
+                    # Installer Docker CLI
+                    apt-get install -y docker.io
+                    
+                    # Vérifier les versions
+                    node --version
+                    npm --version
+                    docker --version
+                '''
+            }
+        }
+        
+        stage('Install Dependencies') {
+            steps {
                 sh 'npm install'
             }
         }
