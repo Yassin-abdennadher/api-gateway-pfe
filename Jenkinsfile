@@ -40,28 +40,11 @@ pipeline {
             }
         }
 
-        stage('Debug') {
-            steps {
-                sh '''
-                    echo "=== Où suis-je ? ==="
-                    pwd
-                    echo "=== Contenu du dossier ==="
-                    ls -la
-                    echo "=== docker-compose.yml existe ? ==="
-                    ls -la docker-compose.yml
-                    echo "=== docker-compose ps ==="
-                    /usr/local/bin/docker-compose ps
-                    echo "=== docker ps ==="
-                    docker ps | grep api-gateway
-                '''
-            }
-        }
         
         stage('Deploy') {
                     steps {
                 sh '''
-                    cd /workspace
-                    /usr/local/bin/docker-compose restart api-gateway
+                    docker restart api-gateway
                 '''
             }
         }
