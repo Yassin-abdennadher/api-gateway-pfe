@@ -9,10 +9,11 @@ const app = express();
 const port = process.env.PORT;
 const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL;
 const MAIN_SERVICE_URL = process.env.MAIN_SERVICE_URL;
+const NOTIFICATIONS_SERVICE_URL = process.env.NOTIFICATIONS_SERVICE_URL;
 app.use(cors({
     origin: 'http://localhost:3000',
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(bodyParser.json({ limit: '10mb' }));
@@ -60,6 +61,27 @@ app.use("/api/main", createProxyMiddleware({
         }
     }
 }));
+app.use("/api/notification", createProxyMiddleware({
+    target: NOTIFICATIONS_SERVICE_URL,
+    changeOrigin: true,
+    pathRewrite: { '^/api/notification': '' },
+    proxyTimeout: 0,
+    timeout: 0,
+    on: {
+        proxyReq: (proxyReq, req, res) => {
+            if (req.body) {
+                const bodyData = JSON.stringify(req.body);
+                proxyReq.setHeader('Content-Type', 'application/json');
+                proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
+                proxyReq.write(bodyData);
+            }
+        },
+        error: (err, req, res) => {
+            console.error('Proxy error:', err);
+            res.status(500).json({ error: err.message });
+        }
+    }
+}));
 app.get("/health", (req, res) => {
     res.json({ status: "OK", service: "api-gateway" });
 });
@@ -67,5 +89,6 @@ app.listen(port, () => {
     console.log(`🚀 Gateway sur port ${port}`);
     console.log(`→ Auth: ${AUTH_SERVICE_URL}`);
     console.log(`→ Main: ${MAIN_SERVICE_URL}`);
+    console.log(`→ Notification: ${NOTIFICATIONS_SERVICE_URL}`);
 });
 //# sourceMappingURL=index.js.map

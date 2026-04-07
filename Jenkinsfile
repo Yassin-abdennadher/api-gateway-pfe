@@ -1,17 +1,11 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:18-alpine'
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
-        }
-    }
+    agent any
     
     environment {
         DOCKER_IMAGE = 'api-gateway'
         CONTAINER_NAME = 'api-gateway'
         NETWORK = 'gmao-network'
         PORT = '8000:8000'
-        COMPOSE_PATH = '/var/jenkins_home/workspace/api-gateway-pfe'
     }
     
     stages {
@@ -23,19 +17,19 @@ pipeline {
         
         stage('Install') {
             steps {
-                sh 'npm install'
+                sh 'docker run --rm -v $PWD:/app -w /app node:18-alpine npm install'
             }
         }
         
         stage('Build') {
             steps {
-                sh 'npm run build'
+                sh 'docker run --rm -v $PWD:/app -w /app node:18-alpine npm run build'
             }
         }
         
         stage('Test') {
             steps {
-                sh 'npm test || echo "No tests found"'
+                sh 'docker run --rm -v $PWD:/app -w /app node:18-alpine npm test || echo "No tests found"'
             }
         }
         
@@ -54,7 +48,6 @@ pipeline {
                         string(credentialsId: 'main-service-url', variable: 'MAIN_SERVICE_URL')
                     ]) {
                         sh """
-                            cd ${COMPOSE_PATH}
                             docker stop ${CONTAINER_NAME} || true
                             docker rm ${CONTAINER_NAME} || true
                             docker run -d \
