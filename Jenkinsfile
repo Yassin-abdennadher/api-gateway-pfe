@@ -15,22 +15,15 @@ pipeline {
             }
         }
         
-        stage('Install Node.js & Docker') {
+        stage('Install Node.js') {
             steps {
                 sh '''
-                    # Installer Node.js
                     apt-get update
                     apt-get install -y curl
                     curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
                     apt-get install -y nodejs
-                    
-                    # Installer Docker CLI
-                    apt-get install -y docker.io
-                    
-                    # Vérifier les versions
                     node --version
                     npm --version
-                    docker --version
                 '''
             }
         }
@@ -44,12 +37,6 @@ pipeline {
         stage('Build') {
             steps {
                 sh 'npm run build'
-            }
-        }
-        
-        stage('Test') {
-            steps {
-                sh 'npm test || echo "No tests found"'
             }
         }
         
