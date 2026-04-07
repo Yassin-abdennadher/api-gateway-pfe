@@ -6,7 +6,6 @@ pipeline {
         CONTAINER_NAME = 'api-gateway'
         NETWORK = 'gmao-network'
         PORT = '8000:8000'
-        WORKSPACE = '/var/jenkins_home/workspace/api-gateway'
     }
     
     stages {
@@ -36,7 +35,7 @@ pipeline {
         
         stage('Docker Build') {
             steps {
-                sh "cd ${WORKSPACE} && docker build -t ${DOCKER_IMAGE}:latest ."
+                sh "docker build -t ${DOCKER_IMAGE}:latest ."
             }
         }
         
