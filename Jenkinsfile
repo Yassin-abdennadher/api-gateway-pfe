@@ -40,11 +40,11 @@ pipeline {
             }
         }
         
-        stage('Deploy with Compose') {
+        stage('Deploy') {
             steps {
                 sh '''
                     cd /workspace
-                    /usr/local/bin/docker-compose up -d api-gateway
+                    /usr/local/bin/docker-compose up -d --no-deps api-gateway
                 '''
             }
         }
