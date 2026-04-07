@@ -44,15 +44,7 @@ pipeline {
             steps {
                 sh '''
                     cd /workspace
-                    
-                    # Build seulement api-gateway
-                    /usr/local/bin/docker-compose build api-gateway
-                    
-                    # Démarrer seulement api-gateway
                     /usr/local/bin/docker-compose up -d api-gateway
-                    
-                    # Vérifier le statut
-                    /usr/local/bin/docker-compose ps
                 '''
             }
         }
