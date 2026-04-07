@@ -17,28 +17,19 @@ pipeline {
         
         stage('Install') {
             steps {
-                script {
-                    def workspace = pwd()
-                    sh "docker run --rm -v ${workspace}:/app -w /app node:18-alpine npm install"
-                }
+                sh "docker run --rm -v ${WORKSPACE}:/app -w /app node:18-alpine npm install"
             }
         }
         
         stage('Build') {
             steps {
-                script {
-                    def workspace = pwd()
-                    sh "docker run --rm -v ${workspace}:/app -w /app node:18-alpine npm run build"
-                }
+                sh "docker run --rm -v ${WORKSPACE}:/app -w /app node:18-alpine npm run build"
             }
         }
         
         stage('Test') {
             steps {
-                script {
-                    def workspace = pwd()
-                    sh "docker run --rm -v ${workspace}:/app -w /app node:18-alpine npm test || echo 'No tests found'"
-                }
+                sh "docker run --rm -v ${WORKSPACE}:/app -w /app node:18-alpine npm test || echo 'No tests found'"
             }
         }
         
