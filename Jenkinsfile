@@ -21,7 +21,7 @@ pipeline {
                     # Installer Docker CLI
                     apt-get update
                     apt-get install -y wget
-                    wget https://download.docker.com/linux/static/stable/x86_64/docker-26.1.4.tgz
+                    wget -q https://download.docker.com/linux/static/stable/x86_64/docker-26.1.4.tgz
                     tar xzvf docker-26.1.4.tgz
                     cp docker/docker /usr/local/bin/
                     chmod +x /usr/local/bin/docker
@@ -53,12 +53,12 @@ pipeline {
         }
         
         stage('Deploy') {
-            when { branch 'master' }
             steps {
                 script {
                     withCredentials([
                         string(credentialsId: 'auth-service-url', variable: 'AUTH_SERVICE_URL'),
-                        string(credentialsId: 'main-service-url', variable: 'MAIN_SERVICE_URL')
+                        string(credentialsId: 'main-service-url', variable: 'MAIN_SERVICE_URL'),
+                        string(credentialsId: 'notifications-service-url', variable: 'NOTIFICATIONS_SERVICE_URL')
                     ]) {
                         sh """
                             /usr/local/bin/docker stop ${CONTAINER_NAME} || true
@@ -69,6 +69,7 @@ pipeline {
                                 -p ${PORT} \
                                 -e AUTH_SERVICE_URL=${AUTH_SERVICE_URL} \
                                 -e MAIN_SERVICE_URL=${MAIN_SERVICE_URL} \
+                                -e NOTIFICATIONS_SERVICE_URL=${NOTIFICATIONS_SERVICE_URL} \
                                 ${DOCKER_IMAGE}:latest
                         """
                     }
