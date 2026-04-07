@@ -148,26 +148,14 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh '''
-                    # Créer le réseau
-                    /usr/local/bin/docker network create gmao-network 2>/dev/null || true
+                    # Monter d'un niveau depuis api-gateway vers Services
+                    cd /var/jenkins_home/workspace/api-gateway/..
                     
-                    # Nettoyer l'ancien conteneur
-                    /usr/local/bin/docker stop api-gateway || true
-                    /usr/local/bin/docker rm api-gateway || true
+                    # Lancer avec docker-compose
+                    /usr/local/bin/docker-compose up -d --build api-gateway
                     
-                    # Lancer le nouveau conteneur
-                    /usr/local/bin/docker run -d \
-                        --name api-gateway \
-                        --network gmao-network \
-                        -p 8000:8000 \
-                        -e NODE_ENV=production \
-                        -e AUTH_SERVICE_URL=http://auth-service:4001 \
-                        -e MAIN_SERVICE_URL=http://main-service:4002 \
-                        -e NOTIFICATIONS_SERVICE_URL=http://notifications-service:4003 \
-                        api-gateway:latest
-                    
-                    # Vérifier que ça tourne
-                    /usr/local/bin/docker ps | grep api-gateway
+                    # Vérifier que tous les services sont sur le même réseau
+                    /usr/local/bin/docker-compose ps
                 '''
             }
         }
