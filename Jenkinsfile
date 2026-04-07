@@ -43,24 +43,8 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh '''
-                    # Supprimer l'ancien
-                    docker rm -f api-gateway 2>/dev/null || true
-                    
-                    # Trouver le réseau existant
-                    NETWORK=$(docker inspect auth-service | grep -o "gmao-network" | head -1)
-                    if [ -z "$NETWORK" ]; then
-                        NETWORK="gmao-network"
-                    fi
-                    
-                    # Lancer sur le même réseau
-                    docker run -d \
-                        --name api-gateway \
-                        --network $NETWORK \
-                        -p 8000:8000 \
-                        -e AUTH_SERVICE_URL=http://auth-service:4001 \
-                        -e MAIN_SERVICE_URL=http://main-service:4002 \
-                        -e NOTIFICATIONS_SERVICE_URL=http://notifications-service:4003 \
-                        api-gateway:latest
+                    cd /workspace
+                    docker-compose restart api-gateway
                 '''
             }
         }
