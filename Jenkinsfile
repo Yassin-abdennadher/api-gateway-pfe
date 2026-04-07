@@ -145,20 +145,29 @@ pipeline {
             }
         }
         
-        stage('Deploy with Compose') {
+        stage('Deploy') {
             steps {
                 sh '''
-                    # Créer le réseau s'il n'existe pas
-                    /usr/local/bin/docker network create ${NETWORK} 2>/dev/null || true
+                    # Créer le réseau
+                    /usr/local/bin/docker network create gmao-network 2>/dev/null || true
                     
-                    # Aller dans le dossier des services
-                    cd ${COMPOSE_PATH}
+                    # Nettoyer l'ancien conteneur
+                    /usr/local/bin/docker stop api-gateway || true
+                    /usr/local/bin/docker rm api-gateway || true
                     
-                    # Redémarrer uniquement api-gateway
-                    /usr/local/bin/docker-compose up -d --build api-gateway
+                    # Lancer le nouveau conteneur
+                    /usr/local/bin/docker run -d \
+                        --name api-gateway \
+                        --network gmao-network \
+                        -p 8000:8000 \
+                        -e NODE_ENV=production \
+                        -e AUTH_SERVICE_URL=http://auth-service:4001 \
+                        -e MAIN_SERVICE_URL=http://main-service:4002 \
+                        -e NOTIFICATIONS_SERVICE_URL=http://notifications-service:4003 \
+                        api-gateway:latest
                     
-                    # Vérifier le statut
-                    /usr/local/bin/docker-compose ps
+                    # Vérifier que ça tourne
+                    /usr/local/bin/docker ps | grep api-gateway
                 '''
             }
         }
