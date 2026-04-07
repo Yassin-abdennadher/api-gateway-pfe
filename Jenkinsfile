@@ -44,7 +44,7 @@ pipeline {
             steps {
                 sh '''
                     cd /workspace
-                    /usr/local/bin/docker-compose up -d --no-deps api-gateway
+                    /usr/local/bin/docker-compose up -d --no-recreate api-gateway
                 '''
             }
         }
